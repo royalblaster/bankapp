@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:17
+    container_name: bankapp-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: ${SERVER_PORT}
+
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+
+    command: ./gradlew bootRun --no-daemon
+    develop:
+      watch:
+        # Rebuild if Gradle build files change
+        - action: rebuild
+          path: ./backend/build.gradle.kts
+        # Sync source code for hot reload (Spring DevTools)
+        - action: sync+restart
+          path: ./backend/src/main
+          target: /app/src/main
+
+volumes:
+  db-data:

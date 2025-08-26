@@ -1,0 +1,20 @@
+# # Base image with Java 24 JDK
+FROM eclipse-temurin:24-jdk
+
+WORKDIR /app
+
+# Copy Gradle wrapper and wrapper files first for caching
+COPY gradlew ./
+COPY gradle ./gradle
+
+# Copy Gradle config files for dependency preloading
+COPY build.gradle.kts settings.gradle.kts ./
+
+# Pre-download dependencies to leverage Docker layer cache
+RUN ./gradlew dependencies --no-daemon || true
+
+# Copy src code
+COPY src src
+
+# Run Spring Boot in continuous mode
+CMD ["./gradlew", "bootRun", "--no-daemon"]
