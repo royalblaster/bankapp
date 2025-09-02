@@ -1,8 +1,13 @@
 package com.banking.backend.customer.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Past;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class CustomerUpdateDTO {
 
@@ -81,4 +86,23 @@ public class CustomerUpdateDTO {
     public void setDob(LocalDate dob) {
         this.dob = dob;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomerUpdateDTO that = (CustomerUpdateDTO) o;
+        return firstName.equals(that.firstName) &&
+                lastName.equals(that.lastName) &&
+                email.equals(that.email) &&
+                address.equals(that.address) &&
+                phone.equals(that.phone) &&
+                dob.equals(that.dob);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, email, address, phone, dob);
+    }
+
 }

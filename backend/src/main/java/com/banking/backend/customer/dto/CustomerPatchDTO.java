@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class CustomerPatchDTO {
     private String firstName;
@@ -78,4 +79,23 @@ public class CustomerPatchDTO {
     public void setDob(LocalDate dob) {
         this.dob = dob;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomerPatchDTO that = (CustomerPatchDTO) o;
+        return Objects.equals(firstName, that.firstName) &&
+                Objects.equals(lastName, that.lastName) &&
+                Objects.equals(email, that.email) &&
+                Objects.equals(address, that.address) &&
+                Objects.equals(phone, that.phone) &&
+                Objects.equals(dob, that.dob);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, email, address, phone, dob);
+    }
+
 }

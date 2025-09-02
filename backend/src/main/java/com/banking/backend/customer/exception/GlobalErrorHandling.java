@@ -1,5 +1,6 @@
 package com.banking.backend.customer.exception;
 
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,7 +29,7 @@ public class GlobalErrorHandling {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
-        String errors = ex.getBindingResult().getFieldErrors().stream().map(error -> error.getField() + ": " + error.getDefaultMessage()).collect(Collectors.joining(", "));
+        String errors = ex.getBindingResult().getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
         ErrorResponse error = new ErrorResponse(Instant.now(), "Validation failed: " + errors, request.getDescription(false));
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
